@@ -7,7 +7,6 @@ import java.util.List;
 
 @Document(collection = "vectorstore")
 public class MongoEntity {
-
     @Id
     private String id;
     private String hash;
@@ -15,7 +14,6 @@ public class MongoEntity {
     private List<Double> embedding;
 
     public MongoEntity() {}
-
     public MongoEntity(String id, String hash, String text, List<Double> embedding) {
         this.id = id;
         this.hash = hash;

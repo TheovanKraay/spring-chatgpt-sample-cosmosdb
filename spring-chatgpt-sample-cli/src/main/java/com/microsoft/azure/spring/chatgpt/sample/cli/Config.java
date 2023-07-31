@@ -5,7 +5,6 @@ import com.azure.core.credential.AzureKeyCredential;
 import com.microsoft.azure.spring.chatgpt.sample.common.AzureOpenAIClient;
 import com.microsoft.azure.spring.chatgpt.sample.common.DocumentIndexPlanner;
 import com.microsoft.azure.spring.chatgpt.sample.common.vectorstore.CosmosDBVectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +22,11 @@ public class Config {
     @Value("${AZURE_OPENAI_APIKEY}")
     private String apiKey;
 
-    @Autowired
     private MongoTemplate mongoTemplate;
+
+    public Config(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Bean
     public DocumentIndexPlanner planner(AzureOpenAIClient openAIClient, CosmosDBVectorStore vectorStore) {

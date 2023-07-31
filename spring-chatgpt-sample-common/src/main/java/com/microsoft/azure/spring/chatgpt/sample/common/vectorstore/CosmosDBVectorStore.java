@@ -34,7 +34,6 @@ public class CosmosDBVectorStore implements VectorStore {
         this.mongoTemplate = mongoTemplate;
     }
 
-
     @Override
     public void saveDocument(String key, DocEntry doc) {
         mongoTemplate.save(doc);
@@ -64,10 +63,7 @@ public class CosmosDBVectorStore implements VectorStore {
         var db = mongoTemplate.getDb();
         AggregateIterable<Document> mongoresult = db.getCollection("vectorstore").aggregate(List.of(bsonCmd));
         List<Document> docs = new ArrayList<>();
-        for (Document doc : mongoresult) {
-            docs.add(doc);
-        }
-        //mongoresult.into(docs);
+        mongoresult.into(docs);
         List<DocEntry> result = new ArrayList<>();
         for (Document doc : docs) {
             String id = doc.getString("id");
@@ -80,19 +76,10 @@ public class CosmosDBVectorStore implements VectorStore {
         return result;
     }
 
-    public void saveToJsonFile(String filePath) {
-        var objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        try (var fileWriter = new FileWriter(filePath, StandardCharsets.UTF_8)) {
-            objectWriter.writeValue(fileWriter, data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void createVectorIndex() {
+    public void createVectorIndex(int numLists, int dimensions, String similarity) {
         String bsonCmd = "{\"createIndexes\":\"vectorstore\",\"indexes\":" +
                 "[{\"name\":\"vectorsearch\",\"key\":{\"embedding\":\"cosmosSearch\"},\"cosmosSearchOptions\":" +
-                "{\"kind\":\"vector-ivf\",\"numLists\":100,\"similarity\":\"COS\",\"dimensions\":1536}}]}";
+                "{\"kind\":\"vector-ivf\",\"numLists\":"+numLists+",\"similarity\":\""+similarity+"\",\"dimensions\":"+dimensions+"}}]}";
         log.info("creating vector index in Cosmos DB Mongo vCore...");
         try {
             mongoTemplate.executeCommand(bsonCmd);
@@ -104,11 +91,17 @@ public class CosmosDBVectorStore implements VectorStore {
     public List<MongoEntity> loadFromJsonFile(String filePath) {
         var reader = new ObjectMapper().reader();
         try {
+            int dimensions = 0;
             var data = reader.readValue(new File(filePath), VectorStoreData.class);
             List<DocEntry> list = new ArrayList<DocEntry>(data.store.values());
             List<MongoEntity> mongoEntities = new ArrayList<>();
             for (DocEntry docEntry : list) {
                 MongoEntity doc = new MongoEntity(docEntry.getId(), docEntry.getHash(), docEntry.getText(), docEntry.getEmbedding());
+                if (dimensions == 0) {
+                    dimensions = docEntry.getEmbedding().size();
+                } else if (dimensions != docEntry.getEmbedding().size()) {
+                    throw new IllegalStateException("Embedding size is not consistent.");
+                }
                 mongoEntities.add(doc);
             }
             //insert to Cosmos DB Mongo API - vCore
@@ -128,14 +121,13 @@ public class CosmosDBVectorStore implements VectorStore {
                         }
                     }
                 }
-                createVectorIndex();
+                createVectorIndex(100, dimensions, "COS");
             }
             return mongoEntities;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
     @Setter
     @Getter
     private static class VectorStoreData {
