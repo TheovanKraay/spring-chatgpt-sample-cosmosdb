@@ -47,10 +47,10 @@ The following prerequisites are required to use this application. Please ensure 
 2. Create the following `environment variables` with the appropriate values:
 
    ```shell
-   set OPENAI_EMBEDDING_DEPLOYMENT_ID=<Your OpenAI embedding deployment id>
-   set OPENAI_CHAT_DEPLOYMENT_ID=<Your Azure OpenAI chat deployment id>
-   set OPENAI_ENDPOINT=<Your Azure OpenAI endpoint>
-   set OPENAI_API_KEY=<Your Azure OpenAI API key>
+   set AZURE_OPENAI_EMBEDDINGDEPLOYMENTID=<Your OpenAI embedding deployment id>
+   set AZURE_OPENAI_CHATDEPLOYMENTID=<Your Azure OpenAI chat deployment id>
+   set AZURE_OPENAI_ENDPOINT=<Your Azure OpenAI endpoint>
+   set AZURE_OPENAI_APIKEY=<Your Azure OpenAI API key>
    set COSMOSDB_DATABASE=<Choose any database name>
    set COSMOSDB_URI=<Cosmos DB Mongo vCore connection string>
    set COSMOSDB_USERNAME=<Username you created for your Cosmos DB Mongo vCore cluster>

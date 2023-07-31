@@ -18,16 +18,16 @@ import java.io.IOException;
 public class Config {
 
 
-    @Value("${OPENAI_EMBEDDING_DEPLOYMENT_ID}")
+    @Value("${AZURE_OPENAI_EMBEDDINGDEPLOYMENTID}")
     private String embeddingDeploymentId;
 
-    @Value("${OPENAI_CHAT_DEPLOYMENT_ID}")
+    @Value("${AZURE_OPENAI_CHATDEPLOYMENTID}")
     private String chatDeploymentId;
 
-    @Value("${OPENAI_ENDPOINT}")
+    @Value("${AZURE_OPENAI_ENDPOINT}")
     private String endpoint;
 
-    @Value("${OPENAI_API_KEY}")
+    @Value("${AZURE_OPENAI_APIKEY}")
     private String apiKey;
 
     @Value("${vector-store.file}")
